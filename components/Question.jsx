@@ -3,21 +3,27 @@ import QuestionTimer from "./QUestionTimer";
 import Answers from "./Answers";
 import QUESTIONS from "../src/questions.js";
 
-export default function Question({
-  onSelectAnswer,
-  handleSkipAnswer,
-  index,
-}) {
+export default function Question({ onSelectAnswer, handleSkipAnswer, index }) {
   const [answer, setAnswer] = useState({
     selectedAnswer: "",
     isCorrect: null,
   });
 
-  function handleSelectAnswer(answer){
+  let timer = 10000;
+
+  if (answer.selectedAnswer) {
+    timer = 1000;
+  }
+
+  if (answer.isCorrect !== null) {
+    timer = 2000;
+  }
+
+  function handleSelectAnswer(answer) {
     setAnswer({
       selectedAnswer: answer,
-      isCorrect: null
-    })
+      isCorrect: null,
+    });
 
     setTimeout(() => {
       setAnswer({
@@ -27,21 +33,26 @@ export default function Question({
     }, 1000);
 
     setTimeout(() => {
-      onSelectAnswer(answer)
-    }, 2000)
+      onSelectAnswer(answer);
+    }, 3000);
   }
 
-  let answerState = ""
+  let answerState = "";
 
-  if(answer.selectedAnswer && answer.isCorrect !== null) {
+  if (answer.selectedAnswer && answer.isCorrect !== null) {
     answerState = answer.isCorrect ? "correct" : "wrong";
-  } else if(answer.selectedAnswer){
+  } else if (answer.selectedAnswer) {
     answerState = "answered";
   }
 
   return (
     <div id="question">
-      <QuestionTimer timeout={10000} onTimeout={handleSkipAnswer} />
+      <QuestionTimer
+        key={timer}
+        mode={answerState}
+        timeout={timer}
+        onTimeout={answer.selectedAnswer === "" ? handleSkipAnswer : null}
+      />
       <h2>{QUESTIONS[index].text}</h2>
       <Answers
         answers={QUESTIONS[index].answers}
